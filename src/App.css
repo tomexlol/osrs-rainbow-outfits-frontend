@@ -1,31 +1,118 @@
-.App {
+body{
+  background-image: url("Rainbow.png");
+  background-blend-mode: normal;
+  background-repeat: no-repeat;
+  background-position: bottom right;
+  background-color: rgb(128, 94, 9);
+  margin: 25px;
+  padding: 10px;
+  background-size: 35%;
+}
+
+
+button{
+  width: 150px;
+  align-self: center;
+}
+.lock-button{
+  width: 20px;
+  height: 20px;
+}
+
+.color-slider{
+  width: 150px;
+  align-self: center;
+}
+.app-container{
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.title-bar{
+width: 500px;
+border: 1px solid black;
+
 }
+
+.content-container{
+width: 500px;
+
+}
+
+.form-container form {
+display: flex;
+flex-direction: column;
+height: 140px;
+padding: 10px;
+}
+
+.set-container div {
+  grid-gap: 5px;
+}
+.gear-visualizer div{
+  border: 2px solid black;
+}
+.gear-visualizer{
+  display: grid;
+  grid-template-rows: repeat(5, 1fr);
+  grid-template-columns: repeat(5, 1fr);
+  font-size: 14px;
+}
+
+.head{
+  grid-row: 1;
+  grid-column: 2;
+}
+
+.cape{
+  grid-row: 2;
+  grid-column: 1;
+}
+
+.neck{ 
+  grid-row: 2;
+  grid-column: 2;
+}
+
+.weapon{ 
+  grid-row: 3;
+  grid-column: 1;
+}
+.body{
+  grid-row: 3;
+  grid-column: 2
+}
+.shield{ 
+  grid-row: 3;
+  grid-column: 3;
+}
+.legs{ 
+  grid-row: 4;
+  grid-column: 2;
+}
+.hands{ 
+  grid-row: 5;
+  grid-column: 1;
+}
+.feet{ 
+  grid-row: 5;
+  grid-column: 2;
+}
+
+[class="2h"] {
+  display: none;
+  grid-row: 3;
+  grid-column: 1;
+
+}
+
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
   }
-}
-
-.App-header {
-  background-color: rgb(128, 94, 9);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
 }
 
 @keyframes App-logo-spin {
