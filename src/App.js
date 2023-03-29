@@ -36,7 +36,7 @@ newGearSet =
     "neck": "11090",
     "cape": "4341"
 }
-
+asd123
 FashionScape =
 SHIELD:-1 (Nothing)
 TORSO:2503 (Black d'hide body)
