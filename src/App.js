@@ -6,18 +6,47 @@ import './App.css';
 /*
 todo:
 []mejorar el algoritmo de los colores para los items multicolores
+  deje notas sobre esto en average_hues.py
 [X]analizar si es productivo separar con mas granularidad o si quedarian muy poco poblados algunos sets del medio
   it is not, its fine as is
 [X]refactorear el return de GearVisualizer para que cada slot esté donde tiene que estar
 [X]added black white gray
-[]boton de exportar outfit - construir el objeto con formato Fashionscape, dartelo en un code box
 [X]boton de "lock slot"
  [X] y de "reroll slot" (al final era distinto pero salio xd)
+[]boton de exportar outfit - construir el objeto con formato Fashionscape, dartelo en un code box
+  hable un rato con chatgpt de esto, es muy facil ya me lo hizo xdxd
 []incorporarlo a tomexlol.com cuando esté medianamente funcional y bonito, agregar css etc
+[]LIMPIAR ESTE CODIGO QUE ES UN ASCO y COMENTARLO
 []escribir un blogpost desglosando qué hace y cómo para pegar laburo xdxd
 
+formatos data para el exportbutton:
+
+newGearSet = 
+{
+    "body": "10061",
+    "feet": "2914",
+    "hands": "13611",
+    "legs": "6787",
+    "shield": "6219",
+    "weapon": "6589",
+    "head": "13137",
+    "neck": "11090",
+    "cape": "4341"
+}
+
+FashionScape =
+SHIELD:-1 (Nothing)
+TORSO:2503 (Black d'hide body)
+CAPE:3789 (Fremennik black cloak)
+LEGS:12229 (Iron plateskirt (t))
+HEAD:12365 (Iron dragon mask)
+AMULET:22400 (Drakan's medallion)
+BOOTS:24403 (Twisted boots (t2))
+WEAPON:25886 (Bow of faerdhinen (c))
+HANDS:26235 (Zaryte vambraces)
 
 */
+
 
 
 const images = {};
@@ -219,32 +248,6 @@ function App() {
     }
     
     setGearSet(newGearSet);
-/*
-newGearSet = 
-{
-    "body": "10061",
-    "feet": "2914",
-    "hands": "13611",
-    "legs": "6787",
-    "shield": "6219",
-    "weapon": "6589",
-    "head": "13137",
-    "neck": "11090",
-    "cape": "4341"
-}
-
-FashionScape =
-SHIELD:-1 (Nothing)
-TORSO:2503 (Black d'hide body)
-CAPE:3789 (Fremennik black cloak)
-LEGS:12229 (Iron plateskirt (t))
-HEAD:12365 (Iron dragon mask)
-AMULET:22400 (Drakan's medallion)
-BOOTS:24403 (Twisted boots (t2))
-WEAPON:25886 (Bow of faerdhinen (c))
-HANDS:26235 (Zaryte vambraces)
-
-*/
   };
 
 
