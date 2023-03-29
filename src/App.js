@@ -16,7 +16,7 @@ todo:
 [X]boton de "lock slot"
  [X] y de "reroll slot" (al final era distinto pero salio xd)
   [] hacerlos bien facheritos, dan asco ahora
-[]boton de exportar outfit - construir el objeto con formato Fashionscape, dartelo en un code box
+[X]boton de exportar outfit - construir el objeto con formato Fashionscape, dartelo en un code box
   hable un rato con chatgpt de esto, es muy facil ya me lo hizo xdxd
 []incorporarlo a tomexlol.com cuando esté medianamente funcional y bonito, agregar css etc
 []LIMPIAR ESTE CODIGO QUE ES UN ASCO y COMENTARLO
