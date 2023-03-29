@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import data from "./output.json"
 import itemNames from "./ids_and_names.json"
 import './App.css';
@@ -32,7 +32,7 @@ function GeneratorForm({ onGenerateSet }) {
   const [hue, setHue] = useState(30);
   const [twoHands, setTwoHands] = useState(false);
   const [hueString, setHueString] = useState("color");
-
+  
   const handleHueChange = (event) => {
     setHue(parseInt(event.target.value));
     const button = document.querySelector('button[type="submit"]');
@@ -133,6 +133,10 @@ function App() {
   const [gearSet, setGearSet] = useState({});
   const [lockedSlots, setLockedSlots] = useState([]);
 
+  useEffect(() => {const isFirstRun = document.getElementsByClassName('first-run')[0];
+  document.getElementsByClassName('form-input-container')[0].style.display = isFirstRun ? "None" : "inline-block"
+}, [gearSet]);
+
   const handleLockedSlots = (slot) => {
     if (typeof lockedSlots === "object" && lockedSlots.includes(slot)){
       //remove
@@ -215,11 +219,34 @@ function App() {
     }
     
     setGearSet(newGearSet);
+/*
+newGearSet = 
+{
+    "body": "10061",
+    "feet": "2914",
+    "hands": "13611",
+    "legs": "6787",
+    "shield": "6219",
+    "weapon": "6589",
+    "head": "13137",
+    "neck": "11090",
+    "cape": "4341"
+}
 
-   // twoHandedFormCheckbox.style.display = "flex"
+FashionScape =
+SHIELD:-1 (Nothing)
+TORSO:2503 (Black d'hide body)
+CAPE:3789 (Fremennik black cloak)
+LEGS:12229 (Iron plateskirt (t))
+HEAD:12365 (Iron dragon mask)
+AMULET:22400 (Drakan's medallion)
+BOOTS:24403 (Twisted boots (t2))
+WEAPON:25886 (Bow of faerdhinen (c))
+HANDS:26235 (Zaryte vambraces)
+
+*/
   };
 
-  
 
   return (
     <>
@@ -232,7 +259,7 @@ function App() {
          <GeneratorForm onGenerateSet={generateSet} />
         </div>
         <div className="set-container">
-        {gearSet["head"] || gearSet["feet"] ? <GearVisualizer gearSet={gearSet} onLockedSlot={handleLockedSlots} onRerollSlot={handleRerollSlot}/> : "gear not generated yet"}
+        {gearSet["head"] || gearSet["feet"] ? <GearVisualizer gearSet={gearSet} onLockedSlot={handleLockedSlots} onRerollSlot={handleRerollSlot}/> : <p className="first-run">gear not generated yet</p>}
         </div>
       </div>
     </div>

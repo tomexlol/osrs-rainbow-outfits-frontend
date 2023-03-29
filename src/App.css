@@ -128,3 +128,6 @@ padding: 10px;
   }
 }
 
+.form-input-container{
+  display: None;
+}
