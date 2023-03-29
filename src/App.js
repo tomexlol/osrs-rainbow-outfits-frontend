@@ -36,7 +36,7 @@ newGearSet =
     "neck": "11090",
     "cape": "4341"
 }
-asd123
+
 FashionScape =
 SHIELD:-1 (Nothing)
 TORSO:2503 (Black d'hide body)
@@ -130,7 +130,7 @@ function GeneratorForm({ onGenerateSet }) {
   );
 }
 
-function GearVisualizer({ gearSet, onLockedSlot, onRerollSlot }) {
+function GearVisualizer({ gearSet, onLockedSlot, onRerollSlot, onExportSet }) {
   const visibleSlots = [
     "head",
     "cape",
@@ -158,12 +158,21 @@ function GearVisualizer({ gearSet, onLockedSlot, onRerollSlot }) {
     );
   });
 
-  return <div className="gear-visualizer">{slotComponents}</div>;
+  return (
+    <>
+    <div className="gear-visualizer">{slotComponents}</div>
+    <div className="export-button-container">aca va el esssport button
+    <button className="export-button" type="button" onClick={() => onExportSet(gearSet)}>eggsportar set</button>
+</div>
+    </>
+    )
 }
 
 function App() {
   const [gearSet, setGearSet] = useState({});
   const [lockedSlots, setLockedSlots] = useState([]);
+  const [exportedSet, setExportedSet] = useState({});
+
 
   useEffect(() => {const isFirstRun = document.getElementsByClassName('first-run')[0];
   document.getElementsByClassName('form-input-container')[0].style.display = isFirstRun ? "None" : "inline-block"
@@ -254,6 +263,30 @@ function App() {
   };
 
 
+
+  const handleExportSet = setData => {
+    const newExportedSet = {}
+    const slotMap = {
+      "head": "HEAD",
+      "cape": "CAPE",
+      "neck": "AMULET",
+      "weapon": "WEAPON",
+      "body": "TORSO",
+      "shield": "SHIELD",
+      "legs": "LEGS",
+      "hands": "HANDS",
+      "feet": "BOOTS",
+      "2h": "WEAPON"
+    };
+    for (const slot in setData ){
+      newExportedSet[slotMap[slot]] = `${setData[slot]} (${itemNames[setData[slot]]})`
+    }
+    console.log(newExportedSet)
+    setExportedSet(newExportedSet)
+    
+  }
+
+
   return (
     <>
     <div className="app-container">
@@ -265,8 +298,14 @@ function App() {
          <GeneratorForm onGenerateSet={generateSet} />
         </div>
         <div className="set-container">
-        {gearSet["head"] || gearSet["feet"] ? <GearVisualizer gearSet={gearSet} onLockedSlot={handleLockedSlots} onRerollSlot={handleRerollSlot}/> : <p className="first-run">gear not generated yet</p>}
+        {gearSet["head"] || gearSet["feet"] ? <GearVisualizer gearSet={gearSet} onExportSet={handleExportSet} onLockedSlot={handleLockedSlots} onRerollSlot={handleRerollSlot}/> : <p className="first-run">gear not generated yet</p>}
         </div>
+        <div className="exported-set-container">
+      <h1>Exported Gear Set:</h1>
+      {Object.entries(exportedSet).map(([slot, item]) => (
+        <p key={slot}>{slot}:{item}</p>
+      ))}
+    </div>
       </div>
     </div>
     </>
