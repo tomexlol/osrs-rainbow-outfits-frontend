@@ -18,6 +18,10 @@ button{
   width: 20px;
   height: 20px;
 }
+.reroll-button{
+  width: 40px;
+  height: 20px;
+}
 
 .color-slider{
   width: 150px;
@@ -123,3 +127,4 @@ padding: 10px;
     transform: rotate(360deg);
   }
 }
+

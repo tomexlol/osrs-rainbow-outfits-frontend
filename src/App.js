@@ -12,7 +12,7 @@ todo:
 [X]added black white gray
 []boton de exportar outfit - construir el objeto con formato Fashionscape, dartelo en un code box
 [X]boton de "lock slot"
- [] y de "reroll slot" (es guardar lockedslots, settearlo a "everything but this", mandarle generate, recuperar viejo lockedSlots)
+ [X] y de "reroll slot" (al final era distinto pero salio xd)
 []incorporarlo a tomexlol.com cuando esté medianamente funcional y bonito, agregar css etc
 []escribir un blogpost desglosando qué hace y cómo para pegar laburo xdxd
 
@@ -31,7 +31,8 @@ importAll(require.context("./icons", false, /\.png$/));
 function GeneratorForm({ onGenerateSet }) {
   const [hue, setHue] = useState(30);
   const [twoHands, setTwoHands] = useState(false);
-  const [hueString, setHueString] = useState("");
+  const [hueString, setHueString] = useState("color");
+
   const handleHueChange = (event) => {
     setHue(parseInt(event.target.value));
     const button = document.querySelector('button[type="submit"]');
@@ -69,20 +70,20 @@ function GeneratorForm({ onGenerateSet }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (hueString !== "color") {onGenerateSet(hueString, twoHands)} else {onGenerateSet(hue, twoHands)};
+    if (hueString !== "color") {onGenerateSet(hueString, twoHands, null)} else {onGenerateSet(hue, twoHands, null)};
   };
 
   
   return (
     <form id = "gear-form" onSubmit={handleSubmit}>
-      <input className="color-slider" type="range" min="30" max="210" step="30" value={hue} onChange={handleHueChange}></input>
-      <label><input type="radio" name="color-mode" value="color" onChange={handleColorModeChange}/> Color </label>
-      <label><input type="radio" name="color-mode" value="black" onChange={handleColorModeChange}/> Black </label>
-      <label><input type="radio" name="color-mode" value="white" onChange={handleColorModeChange}/> White </label>
-      <label><input type="radio" name="color-mode" value="gray" onChange={handleColorModeChange} /> Gray </label>
+      <input name ="colorSlider" className="color-slider" type="range" min="30" max="210" step="30" value={hue} onChange={handleHueChange}></input>
+      <label><input type="radio" checked={hueString === 'color'} name="color-mode" value="color" onChange={handleColorModeChange}/> Color </label>
+      <label><input type="radio" checked={hueString === 'black'} name="color-mode" value="black" onChange={handleColorModeChange}/> Black </label>
+      <label><input type="radio" checked={hueString === 'white'} name="color-mode" value="white" onChange={handleColorModeChange}/> White </label>
+      <label><input type="radio" checked={hueString === 'gray'} name="color-mode" value="gray" onChange={handleColorModeChange} /> Gray </label>
       <div className="form-input-container">
-      <label htmlFor="twoHands">Use 2h weapons</label>
-      <input
+      <label className="two-hands-checkbox" htmlFor="twoHands">Use 2h weapons</label>
+      <input className="two-hands-checkbox"
         type="checkbox"
         id="twoHands"
         name="twoHands"
@@ -97,7 +98,7 @@ function GeneratorForm({ onGenerateSet }) {
   );
 }
 
-function GearVisualizer({ gearSet, onLockedSlot }) {
+function GearVisualizer({ gearSet, onLockedSlot, onRerollSlot }) {
   const visibleSlots = [
     "head",
     "cape",
@@ -119,7 +120,8 @@ function GearVisualizer({ gearSet, onLockedSlot }) {
         <br></br>
         {itemNames[gearSet[slot]]}
         <br></br>
-        <button data-slot={slot} className="lock-button" type="button" onClick={() => onLockedSlot(slot, 1)}>L</button>
+        <button data-slot={slot} className="lock-button" type="button" onClick={() => onLockedSlot(slot)}>L</button>
+        <button data-slot={slot} className="reroll-button" type="button" onClick={() => onRerollSlot(slot)}>RR</button>
       </div>
     );
   });
@@ -157,8 +159,20 @@ function App() {
      } 
     }
   
+    const handleRerollSlot = (slot) => {
+      const formData = new FormData(document.getElementById('gear-form'));
+      const colorModeValue = formData.get("color-mode")
+      const colorSliderValue = formData.get("colorSlider")
+      const twoHandsValue = formData.get("twoHands")
+      console.log(colorModeValue)
+      console.log(colorSliderValue)
+      console.log(twoHandsValue)
+      if (colorModeValue === "color") {generateSet(parseInt(colorSliderValue), twoHandsValue, slot)} else {generateSet(colorModeValue, twoHandsValue, slot)};
+    }
 
-  const generateSet = (hueRange, twoHands) => {
+
+
+  const generateSet = (hueRange, twoHands, rerolledSlot = null) => {
     const visibleSlotsBase = twoHands
       ? ["2h", "body", "cape", "feet", "hands", "head", "legs", "neck"]
       : ["body", "cape", "feet", "hands", "head", "legs", "neck", "shield", "weapon"];
@@ -167,6 +181,24 @@ function App() {
 
     const visibleSlots = visibleSlotsBase.filter((slot) => !lockedSlots.includes(slot));
 
+   
+   
+    if (rerolledSlot !== null){
+      if (typeof hueRange === "number"){
+        newGearSet[rerolledSlot] = data[rerolledSlot][`under_${hueRange}`][Math.floor(Math.random() * data[rerolledSlot][`under_${hueRange}`].length)];
+       } else if (typeof hueRange === "string"){
+        newGearSet[rerolledSlot] = data[rerolledSlot][`${hueRange}`][Math.floor(Math.random() * data[rerolledSlot][`${hueRange}`].length)];
+       }
+       let notRerollSlots = visibleSlots.filter((item) => item !== rerolledSlot)
+       for (const slot of notRerollSlots){
+        newGearSet[slot] = gearSet[slot]
+       }
+       for (const slot of lockedSlots){
+        newGearSet[slot] = gearSet[slot]
+       }
+       setGearSet(newGearSet);
+       return "rerolled"
+      }
 
     if (typeof hueRange === "number"){
       for (const slot of visibleSlots) {
@@ -183,7 +215,8 @@ function App() {
     }
     
     setGearSet(newGearSet);
-    
+
+   // twoHandedFormCheckbox.style.display = "flex"
   };
 
   
@@ -199,7 +232,7 @@ function App() {
          <GeneratorForm onGenerateSet={generateSet} />
         </div>
         <div className="set-container">
-        {gearSet["head"] || gearSet["feet"] ? <GearVisualizer gearSet={gearSet} onLockedSlot={handleLockedSlots}/> : "gear not generated yet"}
+        {gearSet["head"] || gearSet["feet"] ? <GearVisualizer gearSet={gearSet} onLockedSlot={handleLockedSlots} onRerollSlot={handleRerollSlot}/> : "gear not generated yet"}
         </div>
       </div>
     </div>
