@@ -7,12 +7,15 @@ import './App.css';
 todo:
 []mejorar el algoritmo de los colores para los items multicolores
   deje notas sobre esto en average_hues.py
+[]hay una tonelada de items de colores en Blacks, investigar
+  zammy sara dhide defenders mystic robes dark, cosas rojas?
 [X]analizar si es productivo separar con mas granularidad o si quedarian muy poco poblados algunos sets del medio
   it is not, its fine as is
 [X]refactorear el return de GearVisualizer para que cada slot esté donde tiene que estar
 [X]added black white gray
 [X]boton de "lock slot"
  [X] y de "reroll slot" (al final era distinto pero salio xd)
+  [] hacerlos bien facheritos, dan asco ahora
 []boton de exportar outfit - construir el objeto con formato Fashionscape, dartelo en un code box
   hable un rato con chatgpt de esto, es muy facil ya me lo hizo xdxd
 []incorporarlo a tomexlol.com cuando esté medianamente funcional y bonito, agregar css etc
