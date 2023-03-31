@@ -8,7 +8,7 @@ const images = {};
 function importAll(r) {
   r.keys().forEach((key) => (images[key] = r(key)));
 }
-importAll(require.context("./icons", false, /\.png$/));
+importAll(require.context("../public/icons", false, /\.png$/));
 
 
 /*
@@ -30,55 +30,27 @@ todo:
 [X]boton de exportar outfit - construir el objeto con formato Fashionscape, dartelo en un code box
   hable un rato con chatgpt de esto, es muy facil ya me lo hizo xdxd
 []incorporarlo a tomexlol.com cuando esté medianamente funcional y bonito, agregar css etc
-[]LIMPIAR ESTE CODIGO QUE ES UN ASCO y COMENTARLO
+[X]LIMPIAR ESTE CODIGO QUE ES UN ASCO y COMENTARLO
 []escribir un blogpost desglosando qué hace y cómo para pegar laburo xdxd
 
 
-////
-formatos data para el exportbutton:
-
-newGearSet = 
-{
-    "body": "10061",
-    "feet": "2914",
-    "hands": "13611",
-    "legs": "6787",
-    "shield": "6219",
-    "weapon": "6589",
-    "head": "13137",
-    "neck": "11090",
-    "cape": "4341"
-}
-
-FashionScape =
-SHIELD:-1 (Nothing)
-TORSO:2503 (Black d'hide body)
-CAPE:3789 (Fremennik black cloak)
-LEGS:12229 (Iron plateskirt (t))
-HEAD:12365 (Iron dragon mask)
-AMULET:22400 (Drakan's medallion)
-BOOTS:24403 (Twisted boots (t2))
-WEAPON:25886 (Bow of faerdhinen (c))
-HANDS:26235 (Zaryte vambraces)
-
 */
-
 
 //component 1: the form. handles color data and calls onGenerateSet when submitted.
 function GeneratorForm({ onGenerateSet }) {
-  //uses states to handle form data
   const [hue, setHue] = useState(30);
   const [twoHands, setTwoHands] = useState(false);
   const [hueString, setHueString] = useState("color");
   
-  //colors the Generate Set button based on the selected hue
-  //does some magic so that the hue somewhat matches the selected range and so the text is readable
-  const handleHueChange = (event) => {
+
+  //colors the Generate Set button based on the selected hue range
+    const handleHueChange = (event) => {
     setHue(parseInt(event.target.value));
     const button = document.querySelector('button[type="submit"]');
     button.style.backgroundColor = `hsl(${parseInt(event.target.value) >= 120 ? parseInt(event.target.value) + 100 : parseInt(event.target.value) + 15 }, 100%, 50%)`;
     parseInt(event.target.value) === 150 ? button.style.color = "white" : button.style.color = "black"
   };
+
 
   //handles whether (weapon+shield) or (2h) slots are visible whenever value is toggled
   const handleTwoHandsChange = (event) => {
@@ -99,6 +71,9 @@ function GeneratorForm({ onGenerateSet }) {
     } 
   };
 
+
+  //sets the hueString if B/W/G mode is on
+  //also changes the style of "Generate Set" button to match Color Mode
   const handleColorModeChange = (event) => {
     const slider = document.getElementsByClassName('color-slider')[0];
     const button = document.querySelector('button[type="submit"]');
@@ -121,6 +96,7 @@ function GeneratorForm({ onGenerateSet }) {
   }
 
 
+  //calls generateSet with parameters from form
   const handleSubmit = (event) => {
     event.preventDefault();
     if (hueString !== "color") {onGenerateSet(hueString, twoHands, null)} else {onGenerateSet(hue, twoHands, null)};
@@ -151,9 +127,13 @@ function GeneratorForm({ onGenerateSet }) {
   );
 }
 
+
+
+//component 2: the gear visualizer. shows the slots and has buttons to manipulate them and export the set.
 function GearVisualizer({ gearSet, onLockedSlot, onRerollSlot, onExportSet, lockedSlotsList }) {
   let iconsVisible = "yes"
 
+  //toggles Protect Item + Smite icons in each slot. called by toggle-icons class button.
   const toggleIcons = () => {
     const rerollClass = document.querySelectorAll('.reroll-button')
     const lockClass = document.querySelectorAll('.lock-button')
@@ -182,6 +162,7 @@ function GearVisualizer({ gearSet, onLockedSlot, onRerollSlot, onExportSet, lock
        }
   }
 
+  //toggles the borders of each slot. called by toggle-borders-button class button.
   const toggleBorders = () => {
     const toggleBordersButton = document.getElementsByClassName("toggle-borders-button")[0];
     const gridElements = document.querySelectorAll('.gear-visualizer div');
@@ -203,6 +184,8 @@ function GearVisualizer({ gearSet, onLockedSlot, onRerollSlot, onExportSet, lock
     }
   }
 
+
+  //magic follows: for each visible(ingame) slot, grabs the data from gearSet and builds the div for that slot
   const visibleSlots = [
     "head",
     "cape",
@@ -215,12 +198,12 @@ function GearVisualizer({ gearSet, onLockedSlot, onRerollSlot, onExportSet, lock
     "hands",
     "feet",
   ];
+    //we use visibleSlots instead of Object.keys(gearSet) to make both the weapon and the 2h slots regardless of gearSet - otherwise "toggle 2h" gets all fucked
   const slotComponents = visibleSlots.map((slot) => {
     const itemId = gearSet[slot];
     const itemIcon = images[`./${itemId}.png`];
     return (
-      
-      <div key={slot} className={lockedSlotsList.includes(slot) ? `locked-${slot}` : slot}>
+          <div key={slot} className={lockedSlotsList.includes(slot) ? `locked-${slot}` : slot}>
         <img src={itemIcon} alt={itemId} />
         <br></br>
         {itemNames[gearSet[slot]]}
@@ -231,6 +214,7 @@ function GearVisualizer({ gearSet, onLockedSlot, onRerollSlot, onExportSet, lock
     );
   });
 
+  //map ends. returns stuff. checks if there's a gearSet to return post-buttons-container for post-generation actions
   return (
     <>
     <div className="gear-visualizer">{slotComponents}</div>
@@ -244,16 +228,20 @@ function GearVisualizer({ gearSet, onLockedSlot, onRerollSlot, onExportSet, lock
     )
 }
 
+
+//main parent component
 function App() {
   const [gearSet, setGearSet] = useState({});
   const [lockedSlots, setLockedSlots] = useState([]);
   const [exportedSet, setExportedSet] = useState({});
 
-
+//shows a placeholder (class 'first-run' element) if there's no gearSet. hides it when gearSet appears.
   useEffect(() => {const isFirstRun = document.getElementsByClassName('first-run')[0];
   document.getElementsByClassName('form-input-container')[0].style.display = isFirstRun ? "None" : "inline-block"
 }, [gearSet]);
 
+
+  //handles locking slots (Protect Item). called by .lock-button 's
   const handleLockedSlots = (slot) => {
     if (typeof lockedSlots === "object" && lockedSlots.includes(slot)){
       //remove
@@ -261,25 +249,17 @@ function App() {
       console.log(newLockedSlots)
       let filterLockedSlots = newLockedSlots.filter(item => item !== slot);
       setLockedSlots(filterLockedSlots)
-    } else if (typeof lockedSlots === "object" && !lockedSlots.includes(slot))
-    {
+    } else if (typeof lockedSlots === "object" && !lockedSlots.includes(slot)) {
       //add
       let newLockedSlots = [...lockedSlots]
       newLockedSlots.push(slot)
       setLockedSlots(newLockedSlots)
-
-    }
-     else {
-      //add first
-      console.log("case 3")
-      let newLockedSlots = []
-      newLockedSlots.push(slot)
-      setLockedSlots(newLockedSlots)
-      console.log("setting to:")
-      console.log(newLockedSlots)
-     } 
+      }
     }
   
+
+    //handles rerolls (Smite). called by .reroll-button 's
+    //does magic to grab the form data as the form is over in africa and i didn't want to pass 3 states for this xdd
     const handleRerollSlot = (slot) => {
       const formData = new FormData(document.getElementById('gear-form'));
       const colorModeValue = formData.get("color-mode")
@@ -292,7 +272,7 @@ function App() {
     }
 
 
-
+  //handles set generation, called by button type submit and by handleRerollSlot
   const generateSet = (hueRange, twoHands, rerolledSlot = null) => {
     const visibleSlotsBase = twoHands
       ? ["2h", "body", "cape", "feet", "hands", "head", "legs", "neck"]
@@ -303,7 +283,7 @@ function App() {
     const visibleSlots = visibleSlotsBase.filter((slot) => !lockedSlots.includes(slot));
 
    
-   
+    //if called by handleRerollSlot: new set is old set minus rerolledSlot which is re-generated
     if (rerolledSlot !== null){
       if (typeof hueRange === "number"){
         newGearSet[rerolledSlot] = data[rerolledSlot][`under_${hueRange}`][Math.floor(Math.random() * data[rerolledSlot][`under_${hueRange}`].length)];
@@ -321,11 +301,12 @@ function App() {
        return "rerolled"
       }
 
+    //if color mode is Color, hueRange = number. data source has "under_{hueRange}" object.
     if (typeof hueRange === "number"){
       for (const slot of visibleSlots) {
        newGearSet[slot] = data[slot][`under_${hueRange}`][Math.floor(Math.random() * data[slot][`under_${hueRange}`].length)];
     }
-  }
+  } //if color mode is B/W/G, hueRange = string. data source has "{hueRange}" object.
     else if (typeof hueRange === "string"){
       for (const slot of visibleSlots) {
         newGearSet[slot] = data[slot][`${hueRange}`][Math.floor(Math.random() * data[slot][`${hueRange}`].length)];
@@ -339,7 +320,8 @@ function App() {
   };
 
 
-
+  //handles set exporting. called by .export-button.
+  //formats the data to the FashionScape plugin's format and displays it on screen.
   const handleExportSet = setData => {
     const newExportedSet = {}
     const slotMap = {
@@ -362,7 +344,7 @@ function App() {
     
   }
 
-
+  //main app return statement
   return (
     <>
     <div className="app-container">
@@ -374,7 +356,7 @@ function App() {
          <GeneratorForm onGenerateSet={generateSet} />
         </div>
         <div className="set-container">
-        {Object.values(gearSet).length !== 0 ? <GearVisualizer gearSet={gearSet} onExportSet={handleExportSet} onLockedSlot={handleLockedSlots} onRerollSlot={handleRerollSlot} lockedSlotsList={lockedSlots}/> : <p className="first-run">gear not generated yet</p>}
+        {Object.values(gearSet).length !== 0 ? <GearVisualizer gearSet={gearSet} onExportSet={handleExportSet} onLockedSlot={handleLockedSlots} onRerollSlot={handleRerollSlot} lockedSlotsList={lockedSlots}/> : <p className="first-run">Choose a color mode above and Generate a Set!</p>}
         </div>
         <div className="exported-set-container">
       {Object.values(exportedSet).length !== 0 ? <><h1>Exported Gear Set:</h1>
