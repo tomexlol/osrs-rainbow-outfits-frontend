@@ -35,6 +35,7 @@ button{
 width: 500px;
 border: 1px solid #94866d;
 background-color: #b8a282;
+border-bottom: none;
 }
 
 .content-container{
