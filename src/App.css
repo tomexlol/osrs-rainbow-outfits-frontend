@@ -1,27 +1,22 @@
 body{
-  background-image: url("Rainbow.png");
+  background-image: url("Rainbow2.png");
   background-blend-mode: normal;
   background-repeat: no-repeat;
-  background-position: bottom right;
-  background-color: rgb(128, 94, 9);
+  background-position: 25% center;
+  background-color: #e2dbc8;
   margin: 25px;
   padding: 10px;
-  background-size: 35%;
+  background-size: 30%;
+  background-attachment: fixed;
 }
 
 
 button{
-  width: 150px;
+  width: 154px;
   align-self: center;
+  border: 1px solid #94866d;
 }
-.lock-button{
-  width: 20px;
-  height: 20px;
-}
-.reroll-button{
-  width: 40px;
-  height: 20px;
-}
+
 
 .color-slider{
   width: 150px;
@@ -32,17 +27,20 @@ button{
   flex-direction: column;
   overflow: hidden;
   text-align: center;
+  margin-left: 15px;
+  margin-top: 15px;
 }
 
 .title-bar{
 width: 500px;
-border: 1px solid black;
-
+border: 1px solid #94866d;
+background-color: #b8a282;
 }
 
 .content-container{
 width: 500px;
-
+background-color: #d8ccb4;
+border: 1px solid #94866d;
 }
 
 .form-container form {
@@ -52,66 +50,146 @@ height: 140px;
 padding: 10px;
 }
 
+.set-container{
+margin-top: 1px;
+margin-bottom: 1px;
+border-top: 1px solid #94866d;
+padding: 10px;
+}
+
+.exported-set-container{
+border-top: 1px solid #94866d
+}
+
+.post-buttons-container{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 .set-container div {
   grid-gap: 5px;
 }
-.gear-visualizer div{
-  border: 2px solid black;
-}
+
 .gear-visualizer{
   display: grid;
   grid-template-rows: repeat(5, 1fr);
   grid-template-columns: repeat(5, 1fr);
-  font-size: 14px;
+  font-size: 10px;
+  height: 480px;
 }
 
-.head{
+.head, :is(.locked-head){
   grid-row: 1;
   grid-column: 2;
 }
 
-.cape{
+.cape, :is(.locked-cape){
   grid-row: 2;
   grid-column: 1;
 }
 
-.neck{ 
+.neck, :is(.locked-neck){ 
   grid-row: 2;
   grid-column: 2;
 }
 
-.weapon{ 
+.weapon, :is(.locked-weapon){ 
   grid-row: 3;
   grid-column: 1;
 }
-.body{
+.body, :is(.locked-body){
   grid-row: 3;
   grid-column: 2
 }
-.shield{ 
+.shield, :is(.locked-shield){ 
   grid-row: 3;
   grid-column: 3;
 }
-.legs{ 
+.legs, :is(.locked-legs){ 
   grid-row: 4;
   grid-column: 2;
 }
-.hands{ 
+.hands, :is(.locked-hands){ 
   grid-row: 5;
   grid-column: 1;
 }
-.feet{ 
+.feet, :is(.locked-feet){ 
   grid-row: 5;
   grid-column: 2;
 }
 
-[class="2h"] {
+[class="2h"], :is(.locked-2h) {
   display: none;
   grid-row: 3;
   grid-column: 1;
 
 }
 
+[class^="locked-"] {
+background-color: #9a9790;
+
+}
+
+.gear-visualizer div {
+  position: relative;
+  padding-bottom: 23px;
+  border: 1px solid #94866d;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: clip;
+  max-width: 100px;
+  max-height: 100px;
+}
+
+.lock-button{
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  bottom: 0;
+  left: 30%;
+  transform: translateX(-50%);
+  text-align: center;
+  background-color: inherit;
+  background-image: url('protectitem.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  border: none;
+}
+
+.reroll-button{
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  bottom: 0;
+  left: 70%;
+  transform: translateX(-50%);
+  background-color: inherit;
+  font-size: 10px;
+  background-image: url('smite.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  border: none;
+}
+.export-button{
+  margin-top: 20px;
+  background-color: #b8a282;
+  white-space: nowrap;
+  padding-left: 5px;
+  padding-right: 5px;
+  width: auto;
+}
+.toggle-icons-button{
+  margin-top: 10px;
+  background-color: gray;
+margin-right: auto;
+width: auto;
+}
+.toggle-borders-button{
+  margin-top: 10px;
+  background-color: gray;
+margin-right: auto;
+width: auto;
+}
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {

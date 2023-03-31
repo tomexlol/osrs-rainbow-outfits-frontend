@@ -3,25 +3,38 @@ import data from "./output.json"
 import itemNames from "./ids_and_names.json"
 import './App.css';
 
+//import all icon files (magic)
+const images = {};
+function importAll(r) {
+  r.keys().forEach((key) => (images[key] = r(key)));
+}
+importAll(require.context("./icons", false, /\.png$/));
+
+
 /*
 todo:
+  back:
 []mejorar el algoritmo de los colores para los items multicolores
   deje notas sobre esto en average_hues.py
 []hay una tonelada de items de colores en Blacks, investigar
   zammy sara dhide defenders mystic robes dark, cosas rojas?
+
+  front:
 [X]analizar si es productivo separar con mas granularidad o si quedarian muy poco poblados algunos sets del medio
   it is not, its fine as is
 [X]refactorear el return de GearVisualizer para que cada slot esté donde tiene que estar
 [X]added black white gray
 [X]boton de "lock slot"
  [X] y de "reroll slot" (al final era distinto pero salio xd)
-  [] hacerlos bien facheritos, dan asco ahora
+  [X] hacerlos bien facheritos, dan asco ahora
 [X]boton de exportar outfit - construir el objeto con formato Fashionscape, dartelo en un code box
   hable un rato con chatgpt de esto, es muy facil ya me lo hizo xdxd
 []incorporarlo a tomexlol.com cuando esté medianamente funcional y bonito, agregar css etc
 []LIMPIAR ESTE CODIGO QUE ES UN ASCO y COMENTARLO
 []escribir un blogpost desglosando qué hace y cómo para pegar laburo xdxd
 
+
+////
 formatos data para el exportbutton:
 
 newGearSet = 
@@ -51,20 +64,15 @@ HANDS:26235 (Zaryte vambraces)
 */
 
 
-
-const images = {};
-function importAll(r) {
-  r.keys().forEach((key) => (images[key] = r(key)));
-}
-importAll(require.context("./icons", false, /\.png$/));
-
-//const iconSrc = images[`./${itemId}.png`];
-
+//component 1: the form. handles color data and calls onGenerateSet when submitted.
 function GeneratorForm({ onGenerateSet }) {
+  //uses states to handle form data
   const [hue, setHue] = useState(30);
   const [twoHands, setTwoHands] = useState(false);
   const [hueString, setHueString] = useState("color");
   
+  //colors the Generate Set button based on the selected hue
+  //does some magic so that the hue somewhat matches the selected range and so the text is readable
   const handleHueChange = (event) => {
     setHue(parseInt(event.target.value));
     const button = document.querySelector('button[type="submit"]');
@@ -72,6 +80,7 @@ function GeneratorForm({ onGenerateSet }) {
     parseInt(event.target.value) === 150 ? button.style.color = "white" : button.style.color = "black"
   };
 
+  //handles whether (weapon+shield) or (2h) slots are visible whenever value is toggled
   const handleTwoHandsChange = (event) => {
     setTwoHands(event.target.checked);
     const shieldSlot = document.getElementsByClassName('shield')[0];
@@ -92,11 +101,23 @@ function GeneratorForm({ onGenerateSet }) {
 
   const handleColorModeChange = (event) => {
     const slider = document.getElementsByClassName('color-slider')[0];
+    const button = document.querySelector('button[type="submit"]');
     if (event.target.value === "color"){
       slider.style.display = ""
       setHueString(false)
+      button.style.backgroundColor = `hsl(${parseInt(hue) >= 120 ? parseInt(hue) + 100 : parseInt(hue) + 15 }, 100%, 50%)`;
+      parseInt(hue) === 150 ? button.style.color = "white" : button.style.color = "black"
     } else {slider.style.display = "none"}
     setHueString(event.target.value)
+    if (event.target.value === "black") {
+      button.style.backgroundColor = "black"
+      button.style.color = "white"
+    } else if (event.target.value === "white") {
+      button.style.backgroundColor = "white"
+      button.style.color = "black"
+    } else if (event.target.value === "gray") {
+      button.style.backgroundColor = "gray"
+    }
   }
 
 
@@ -130,7 +151,58 @@ function GeneratorForm({ onGenerateSet }) {
   );
 }
 
-function GearVisualizer({ gearSet, onLockedSlot, onRerollSlot, onExportSet }) {
+function GearVisualizer({ gearSet, onLockedSlot, onRerollSlot, onExportSet, lockedSlotsList }) {
+  let iconsVisible = "yes"
+
+  const toggleIcons = () => {
+    const rerollClass = document.querySelectorAll('.reroll-button')
+    const lockClass = document.querySelectorAll('.lock-button')
+    const lockBgImage = window.getComputedStyle(lockClass[0]).getPropertyValue('background-image');
+    const rerollBgImage = window.getComputedStyle(rerollClass[0]).getPropertyValue('background-image');
+    const toggleButtonsButton = document.getElementsByClassName("toggle-icons-button")[0];
+
+    console.log(iconsVisible)
+    if (lockBgImage !== "none" && rerollBgImage !== "none") {
+    
+      for (let i = 0; i < lockClass.length; i++) {
+        lockClass[i].style.backgroundImage = 'none';
+      } for (let i = 0; i < rerollClass.length; i++) {
+        rerollClass[i].style.backgroundImage = 'none';
+      }
+      toggleButtonsButton.textContent = "Show Buttons";
+      toggleButtonsButton.style.backgroundColor = "#b8a282";
+       } else {
+               for (let i = 0; i < lockClass.length; i++) {
+        lockClass[i].style.backgroundImage = '';
+      } for (let i = 0; i < rerollClass.length; i++) {
+        rerollClass[i].style.backgroundImage = '';
+      }
+      toggleButtonsButton.textContent = "Hide Buttons";
+      toggleButtonsButton.style.backgroundColor = "";
+       }
+  }
+
+  const toggleBorders = () => {
+    const toggleBordersButton = document.getElementsByClassName("toggle-borders-button")[0];
+    const gridElements = document.querySelectorAll('.gear-visualizer div');
+    const gridElementsBorder = window.getComputedStyle(gridElements[1]).getPropertyValue('border');
+    console.log(gridElementsBorder)
+    if (gridElementsBorder !== "0px none rgb(0, 0, 0)") {
+      for (let i = 0; i < gridElements.length; i++){
+        gridElements[i].style.border = "none"
+      }
+      toggleBordersButton.style.backgroundColor = "#b8a282"
+      toggleBordersButton.textContent = "Show Borders";
+    } else {
+        for (let i = 0; i < gridElements.length; i++){
+          gridElements[i].style.border = "1px solid #94866d";
+          console.log(gridElements[i].style.border)
+        }
+      toggleBordersButton.style.backgroundColor = "gray"
+      toggleBordersButton.textContent = "Hide Borders"
+    }
+  }
+
   const visibleSlots = [
     "head",
     "cape",
@@ -147,13 +219,14 @@ function GearVisualizer({ gearSet, onLockedSlot, onRerollSlot, onExportSet }) {
     const itemId = gearSet[slot];
     const itemIcon = images[`./${itemId}.png`];
     return (
-      <div key={slot} className={slot}>
+      
+      <div key={slot} className={lockedSlotsList.includes(slot) ? `locked-${slot}` : slot}>
         <img src={itemIcon} alt={itemId} />
         <br></br>
         {itemNames[gearSet[slot]]}
         <br></br>
-        <button data-slot={slot} className="lock-button" type="button" onClick={() => onLockedSlot(slot)}>L</button>
-        <button data-slot={slot} className="reroll-button" type="button" onClick={() => onRerollSlot(slot)}>RR</button>
+        <button data-slot={slot} className="lock-button" type="button" onClick={() => onLockedSlot(slot)}>{lockedSlotsList.includes(slot) ? "" : ""}</button>
+        {!lockedSlotsList.includes(slot) ? <button data-slot={slot} className="reroll-button" type="button" onClick={() => onRerollSlot(slot)}></button> : ""}
       </div>
     );
   });
@@ -161,9 +234,12 @@ function GearVisualizer({ gearSet, onLockedSlot, onRerollSlot, onExportSet }) {
   return (
     <>
     <div className="gear-visualizer">{slotComponents}</div>
-    <div className="export-button-container">aca va el esssport button
-    <button className="export-button" type="button" onClick={() => onExportSet(gearSet)}>eggsportar set</button>
-</div>
+    {Object.values(gearSet).length !== 0 ? <><div className="post-buttons-container">
+    <button className="toggle-icons-button" type="button" onClick={toggleIcons}>Hide Buttons</button>
+    <button className="toggle-borders-button" type="button" onClick={toggleBorders}>Hide Inner Borders</button>
+    <button className="export-button" type="button" onClick={() => onExportSet(gearSet)}>Export to FashionScape</button>
+    </div>
+    </> : ""}
     </>
     )
 }
@@ -188,7 +264,7 @@ function App() {
     } else if (typeof lockedSlots === "object" && !lockedSlots.includes(slot))
     {
       //add
-      let newLockedSlots = lockedSlots
+      let newLockedSlots = [...lockedSlots]
       newLockedSlots.push(slot)
       setLockedSlots(newLockedSlots)
 
@@ -298,13 +374,17 @@ function App() {
          <GeneratorForm onGenerateSet={generateSet} />
         </div>
         <div className="set-container">
-        {gearSet["head"] || gearSet["feet"] ? <GearVisualizer gearSet={gearSet} onExportSet={handleExportSet} onLockedSlot={handleLockedSlots} onRerollSlot={handleRerollSlot}/> : <p className="first-run">gear not generated yet</p>}
+        {Object.values(gearSet).length !== 0 ? <GearVisualizer gearSet={gearSet} onExportSet={handleExportSet} onLockedSlot={handleLockedSlots} onRerollSlot={handleRerollSlot} lockedSlotsList={lockedSlots}/> : <p className="first-run">gear not generated yet</p>}
         </div>
         <div className="exported-set-container">
-      <h1>Exported Gear Set:</h1>
+      {Object.values(exportedSet).length !== 0 ? <><h1>Exported Gear Set:</h1>
+      <pre style={{ border: '1px solid #ccc', padding: '1rem' }}>
+      <code>
       {Object.entries(exportedSet).map(([slot, item]) => (
         <p key={slot}>{slot}:{item}</p>
       ))}
+      </code>
+      </pre></> : ""}
     </div>
       </div>
     </div>
