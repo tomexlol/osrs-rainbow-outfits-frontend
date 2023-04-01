@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import data from "./output.json"
 import itemNames from "./ids_and_names.json"
 import './App.css';
+import protectItem from "./protectitem.png"
+import smite from "./smite.png"
+
 
 //import all icon files (magic)
 const images = {};
@@ -184,6 +187,16 @@ function GearVisualizer({ gearSet, onLockedSlot, onRerollSlot, onExportSet, lock
     }
   }
 
+  const toggleTutorial = () => {
+    const tutorialDiv = document.getElementsByClassName("tutorial-container")[0];
+    const tutorialDivDisplay = window.getComputedStyle(tutorialDiv).getPropertyValue("display");
+    if (tutorialDivDisplay === "none") {
+      tutorialDiv.style.display = "block"
+    } else {
+      tutorialDiv.style.display = ""
+    }
+  }
+
 
   //magic follows: for each visible(ingame) slot, grabs the data from gearSet and builds the div for that slot
   const visibleSlots = [
@@ -219,9 +232,11 @@ function GearVisualizer({ gearSet, onLockedSlot, onRerollSlot, onExportSet, lock
     <>
     <div className="gear-visualizer">{slotComponents}</div>
     {Object.values(gearSet).length !== 0 ? <><div className="post-buttons-container">
+    <button className="tutorial-button" type="button" onClick={toggleTutorial}></button>
     <button className="toggle-icons-button" type="button" onClick={toggleIcons}>Hide Buttons</button>
-    <button className="toggle-borders-button" type="button" onClick={toggleBorders}>Hide Inner Borders</button>
+    <button className="toggle-borders-button" type="button" onClick={toggleBorders}>Hide Borders</button>
     <button className="export-button" type="button" onClick={() => onExportSet(gearSet)}>Export to FashionScape</button>
+    
     </div>
     </> : ""}
     </>
@@ -270,6 +285,40 @@ function App() {
       console.log(twoHandsValue)
       if (colorModeValue === "color") {generateSet(parseInt(colorSliderValue), twoHandsValue, slot)} else {generateSet(colorModeValue, twoHandsValue, slot)};
     }
+
+
+  const handleCopyExportedSet = () => {
+    const copyButton = document.getElementsByClassName("export-copy-button")[0];
+    let exportedText = '';
+    for (const key in exportedSet) {
+      exportedText += `${key}:${exportedSet[key]}\n`;
+    }
+    navigator.clipboard.writeText(exportedText)
+    .then(() => {
+      copyButton.innerText = "Text copied!"
+      setTimeout(() => {
+        copyButton.innerText = "Copy text"
+      }, 3000);
+      console.log('Text copied to clipboard');
+    })
+    .catch((error) => {
+      console.error('Could not copy text: ', error);
+    });
+  }
+
+  const handleDownloadExportedSet = () => {
+    let exportedText = '';
+    for (const key in exportedSet) {
+      exportedText += `${key}:${exportedSet[key]}\n`;
+    }
+    const element = document.createElement('a');
+    const file = new Blob([exportedText], { type: "text/plain"});
+    element.href = URL.createObjectURL(file);
+    element.download = "outfit.txt";
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  }
 
 
   //handles set generation, called by button type submit and by handleRerollSlot
@@ -357,9 +406,16 @@ function App() {
         </div>
         <div className="set-container">
         {Object.values(gearSet).length !== 0 ? <GearVisualizer gearSet={gearSet} onExportSet={handleExportSet} onLockedSlot={handleLockedSlots} onRerollSlot={handleRerollSlot} lockedSlotsList={lockedSlots}/> : <p className="first-run">Choose a color mode above and Generate a Set!</p>}
+        <div className="tutorial-container">
+          <p><img src={protectItem} alt="Protect Item"></img>Protect Item: protects your item from being rerolled.</p>
+          <p><img src={smite} alt="Smite"></img>Smite: rerolls one specific item</p>
+          <p>To export: save text file at runelite/common/.runelite/outfits<br></br>Load it with the FashionScape plugin (get it from Plugin Hub)</p>
+        </div>
         </div>
         <div className="exported-set-container">
-      {Object.values(exportedSet).length !== 0 ? <><h1>Exported Gear Set:</h1>
+      {Object.values(exportedSet).length !== 0 ? <><h1>Exported Gear Set</h1>
+      <button className="export-copy-button" type="button" onClick={handleCopyExportedSet}>Copy Text</button>
+      <button className="export-download-button" type="button" onClick={handleDownloadExportedSet}>Download .txt</button>
       <pre style={{ border: '1px solid #ccc', padding: '1rem' }}>
       <code>
       {Object.entries(exportedSet).map(([slot, item]) => (

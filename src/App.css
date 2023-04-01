@@ -31,6 +31,37 @@ button{
   margin-top: 15px;
 }
 
+.tutorial-container{
+  position: absolute;
+  bottom: 0;
+  left: calc(100% + 20px);
+  display: none;
+  width: 500px;
+  background-color: #d8ccb4;
+  border: 1px solid #94866d;
+}
+.tutorial-button{
+  width: 15px;
+  height: 15px;
+  border: none;
+  background-color: #d8ccb4;
+  background-image: url('lumbridge.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  position: absolute;
+  right: 5px;
+  bottom: 12.5%;
+}
+.export-copy-button{
+  margin-right: 20px;
+  background-color: #b8a282;
+  width: auto;
+}
+.export-download-button{
+  margin-left: 20px;
+  background-color: #b8a282;
+  width: auto;
+}
 .title-bar{
 width: 500px;
 border: 1px solid #94866d;
@@ -56,6 +87,7 @@ margin-top: 1px;
 margin-bottom: 1px;
 border-top: 1px solid #94866d;
 padding: 10px;
+position: relative;
 }
 
 .exported-set-container{
@@ -147,7 +179,7 @@ background-color: #9a9790;
   height: 20px;
   position: absolute;
   bottom: 0;
-  left: 30%;
+  left: 20%;
   transform: translateX(-50%);
   text-align: center;
   background-color: inherit;
@@ -162,8 +194,7 @@ background-color: #9a9790;
   height: 20px;
   position: absolute;
   bottom: 0;
-  left: 70%;
-  transform: translateX(-50%);
+  right: 10%;
   background-color: inherit;
   font-size: 10px;
   background-image: url('smite.png');
@@ -181,15 +212,15 @@ background-color: #9a9790;
 }
 .toggle-icons-button{
   margin-top: 10px;
+  width: 100px;
   background-color: gray;
-margin-right: auto;
-width: auto;
+  margin-right: auto;
 }
 .toggle-borders-button{
-  margin-top: 10px;
+  margin-top: 5px;
+  width: 100px;
   background-color: gray;
-margin-right: auto;
-width: auto;
+  margin-right: auto;
 }
 
 @media (prefers-reduced-motion: no-preference) {
